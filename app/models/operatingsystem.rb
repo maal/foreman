@@ -57,6 +57,7 @@ class Operatingsystem < ActiveRecord::Base
                'Windows'   => %r{Windows}i,
                'Altlinux'  => %r{Altlinux}i,
                'Archlinux' => %r{Archlinux}i,
+               'Coreos'    => %r{Coreos}i,
                'Gentoo'    => %r{Gentoo}i,
                'Solaris'   => %r{Solaris}i,
                'Freebsd'   => %r{FreeBSD}i,
@@ -243,7 +244,11 @@ class Operatingsystem < ActiveRecord::Base
     raise (_("invalid medium for %s") % to_s) unless media.include?(medium)
     raise (_("invalid architecture for %s") % to_s) unless architectures.include?(architecture)
     eval("#{self.family}::PXEFILES").values.collect do |img|
-      medium_vars_to_uri("#{medium.path}/#{pxedir}/#{img}", architecture.name, self)
+      if pxedir.empty?
+        medium_vars_to_uri("#{medium.path}/#{img}", architecture.name, self)
+      else
+        medium_vars_to_uri("#{medium.path}/#{pxedir}/#{img}", architecture.name, self)
+      end
     end
   end
 
